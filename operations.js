@@ -51,6 +51,7 @@ export const operations = [
     label: "Division",
     symbol: "÷",
     args: 2,
+     contributor: "shmuel",
     execute: (a, b) => {
       if (b === 0) {
         throw new Error("Cannot divide by zero");
