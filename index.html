@@ -35,18 +35,28 @@
             <div class="display-hint" id="display-hint">Choose a number to get started</div>
           </div>
 
-          <div class="keypad" id="keypad" aria-label="Number keypad">
-            <button class="number-key" type="button" data-digit="7">7</button>
-            <button class="number-key" type="button" data-digit="8">8</button>
-            <button class="number-key" type="button" data-digit="9">9</button>
-            <button class="number-key" type="button" data-digit="4">4</button>
-            <button class="number-key" type="button" data-digit="5">5</button>
-            <button class="number-key" type="button" data-digit="6">6</button>
-            <button class="number-key" type="button" data-digit="1">1</button>
-            <button class="number-key" type="button" data-digit="2">2</button>
-            <button class="number-key" type="button" data-digit="3">3</button>
-            <button class="number-key number-zero" type="button" data-digit="0">0</button>
-            <button class="clear-key" id="clear" type="button">C <span>Clear</span></button>
+          <div class="calculator-controls">
+            <div class="keypad" id="keypad" aria-label="Number keypad">
+              <button class="number-key" type="button" data-digit="7">7</button>
+              <button class="number-key" type="button" data-digit="8">8</button>
+              <button class="number-key" type="button" data-digit="9">9</button>
+              <button class="number-key" type="button" data-digit="4">4</button>
+              <button class="number-key" type="button" data-digit="5">5</button>
+              <button class="number-key" type="button" data-digit="6">6</button>
+              <button class="number-key" type="button" data-digit="1">1</button>
+              <button class="number-key" type="button" data-digit="2">2</button>
+              <button class="number-key" type="button" data-digit="3">3</button>
+              <button class="number-key" type="button" data-digit="0">0</button>
+              <button class="number-key" type="button" data-digit=".">.</button>
+              <button class="clear-key" id="clear" type="button">C <span>Clear</span></button>
+              <button class="equals-key" id="equals" type="button" aria-label="Calculate">=</button>
+            </div>
+
+            <section class="operation-panel" aria-labelledby="operations-title">
+              <h2 id="operations-title">Class Operations</h2>
+              <div class="operation-grid" id="operation-grid" aria-live="polite"></div>
+              <p class="empty-operations" id="empty-operations">No operations yet. Be the first to add one!</p>
+            </section>
           </div>
         </section>
 
@@ -65,18 +75,6 @@
           <a class="contribute-link" href="README.md">How to contribute <span aria-hidden="true">↗</span></a>
         </aside>
       </div>
-
-      <section class="operations-section" aria-labelledby="operations-title">
-        <div class="section-heading operations-heading">
-          <div>
-            <p class="eyebrow">GROWING TOGETHER</p>
-            <h2 id="operations-title">Class Operations</h2>
-          </div>
-          <p class="operations-note">New buttons appear when a classmate's pull request is merged.</p>
-        </div>
-        <div class="operation-grid" id="operation-grid" aria-live="polite"></div>
-        <p class="empty-operations" id="empty-operations">No operations yet. Be the first to add one!</p>
-      </section>
 
       <footer class="page-footer">
         <span>Made for curious minds.</span>

@@ -1,7 +1,6 @@
 // Add one object per operation. See README.md for the operation contract.
 
 export const operations = [
- 
   {
     id: "sub",
     label: "Subtraction",
@@ -10,9 +9,27 @@ export const operations = [
     contributor: "Shneor bardugo",
     execute: (first, second) => first - second,
   },
-
- 
-
+  {
+    id: "mul",
+    label: "Multiplication",
+    symbol: "*",
+    arity: 2,
+    contributor: "Shneor bardugo",
+    execute: (first, second) => first * second,
+  },
+  {
+    id: "modulo",
+    label: "Modulo",
+    symbol: "%",
+    arity: 2,
+    contributor: "pinchas",
+    execute: (first, second) => {
+      if (second === 0) {
+        throw new Error("Cannot modulo by zero");
+      }
+      return first % second;
+    },
+  },
   {
     id: "power",
     label: "Power",
@@ -21,17 +38,12 @@ export const operations = [
     contributor: "shmuel",
     execute: (base, exponent) => base ** exponent,
   },
-
-
-
-
-
-  {
+ {
     id: "factorial",
     label: "Factorial",
     symbol: "n!",
     arity: 1,
-    contributor: "nch22522",
+    contributor: "pinchas",
     execute: (n) => {
       if (!Number.isInteger(n) || n < 0) {
         throw new Error("Factorial requires a non-negative integer");
@@ -46,6 +58,7 @@ export const operations = [
       return result;
     },
   },
+
   {
     id: "division",
     label: "Division",
@@ -59,5 +72,6 @@ export const operations = [
       return a / b;
     },
   },
+
 
 ];

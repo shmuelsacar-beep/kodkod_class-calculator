@@ -5,12 +5,14 @@ const displayStatus = document.querySelector("#display-status");
 const displayHint = document.querySelector("#display-hint");
 const keypad = document.querySelector("#keypad");
 const clearButton = document.querySelector("#clear");
+const equalsButton = document.querySelector("#equals");
 const operationGrid = document.querySelector("#operation-grid");
 const emptyOperations = document.querySelector("#empty-operations");
 const contributorList = document.querySelector("#contributor-list");
 const operationCount = document.querySelector("#operation-count");
 
 let currentValue = 0;
+let currentInput = "0";
 let pendingOperation = null;
 let awaitingSecondOperand = false;
 let replaceOnNextDigit = false;
@@ -29,7 +31,7 @@ function setStatus(message, isError = false) {
 }
 
 function updateDisplay() {
-  display.textContent = formatNumber(currentValue);
+  display.textContent = currentInput;
   displayHint.textContent = pendingOperation
     ? `${formatNumber(pendingOperation.firstOperand)} ${pendingOperation.operation.symbol} — enter another number`
     : "Choose a number to get started";
@@ -37,18 +39,28 @@ function updateDisplay() {
 
 function enterDigit(digit) {
   if (awaitingSecondOperand || replaceOnNextDigit) {
-    currentValue = Number(digit);
+    currentValue = 0;
+    currentInput = "0";
     awaitingSecondOperand = false;
     replaceOnNextDigit = false;
+  }
+
+  if (digit === ".") {
+    if (currentInput.includes(".")) {
+      return;
+    }
+    currentInput += ".";
   } else {
-    const nextValue = `${currentValue === 0 ? "" : formatNumber(currentValue)}${digit}`;
-    if (nextValue.length > 15) {
+    const nextValue = `${currentInput === "0" ? "" : currentInput}${digit}`;
+    if (nextValue.replace(".", "").length > 15) {
       setStatus("Maximum of 15 digits", true);
       return;
     }
+    currentInput = nextValue;
     currentValue = Number(nextValue);
   }
 
+  currentValue = Number(currentInput);
   setStatus(pendingOperation ? "Enter the second number" : "Number entered");
   updateDisplay();
 }
@@ -60,12 +72,12 @@ function calculate(operation, firstOperand, secondOperand) {
       : operation.execute(firstOperand, secondOperand);
     const parsedResult = Number(result);
     currentValue = Number(formatNumber(parsedResult));
+    currentInput = formatNumber(currentValue);
     pendingOperation = null;
     awaitingSecondOperand = false;
     replaceOnNextDigit = true;
     setStatus(`${operation.label} complete`);
     updateDisplay();
-    renderEqualsButton();
   } catch (error) {
     setStatus(error instanceof Error ? error.message : "The operation could not be completed.", true);
   }
@@ -85,34 +97,6 @@ function selectOperation(operation) {
   replaceOnNextDigit = false;
   setStatus(`Selected ${operation.label}`);
   updateDisplay();
-  renderEqualsButton();
-}
-
-function renderEqualsButton() {
-  const existingButton = keypad.querySelector(".equals-key");
-  if (existingButton) {
-    existingButton.remove();
-  }
-
-  if (!pendingOperation) {
-    return;
-  }
-
-  const equalsButton = document.createElement("button");
-  equalsButton.className = "equals-key";
-  equalsButton.type = "button";
-  equalsButton.textContent = `Calculate ${pendingOperation.operation.label}`;
-  equalsButton.setAttribute("aria-label", `Calculate ${pendingOperation.operation.label}`);
-  equalsButton.addEventListener("click", () => {
-    if (awaitingSecondOperand) {
-      setStatus("Enter the second number first", true);
-      return;
-    }
-
-    calculate(pendingOperation.operation, pendingOperation.firstOperand, currentValue);
-    renderEqualsButton();
-  });
-  keypad.append(equalsButton);
 }
 
 function renderOperations() {
@@ -125,11 +109,13 @@ function renderOperations() {
     const button = document.createElement("button");
     button.className = "operation-button";
     button.type = "button";
+    button.dataset.operationSymbol = operation.symbol;
     button.setAttribute("aria-label", `${operation.label}, ${operation.arity === 1 ? "one" : "two"} number${operation.arity === 1 ? "" : "s"}`);
+    button.title = operation.label;
 
     const symbol = document.createElement("span");
     symbol.className = "operation-symbol";
-    symbol.textContent = operation.symbol;
+    symbol.textContent = operation.symbol === "n!" ? "!" : operation.symbol;
 
     const label = document.createElement("span");
     label.className = "operation-label";
@@ -175,13 +161,110 @@ keypad.addEventListener("click", (event) => {
 });
 
 clearButton.addEventListener("click", () => {
+  clearCalculator();
+});
+
+function clearCalculator() {
   currentValue = 0;
+  currentInput = "0";
   pendingOperation = null;
   awaitingSecondOperand = false;
   replaceOnNextDigit = false;
   setStatus("Ready when you are");
   updateDisplay();
-  renderEqualsButton();
+}
+
+function calculatePendingOperation() {
+  if (!pendingOperation) {
+    setStatus("Select an operation first", true);
+    return;
+  }
+
+  if (awaitingSecondOperand) {
+    setStatus("Enter the second number first", true);
+    return;
+  }
+
+  calculate(pendingOperation.operation, pendingOperation.firstOperand, currentValue);
+}
+
+equalsButton.addEventListener("click", calculatePendingOperation);
+
+function deleteLastDigit() {
+  if (currentInput === "0") {
+    clearCalculator();
+    return;
+  }
+
+  if (awaitingSecondOperand || replaceOnNextDigit) {
+    currentInput = "0";
+    currentValue = 0;
+    awaitingSecondOperand = false;
+    replaceOnNextDigit = false;
+  } else {
+    currentInput = currentInput.slice(0, -1) || "0";
+    currentValue = Number(currentInput);
+  }
+
+  setStatus(pendingOperation ? "Enter the second number" : "Number entered");
+  updateDisplay();
+}
+
+function flashButton(button) {
+  if (!button) {
+    return;
+  }
+
+  button.classList.add("pressed");
+  window.setTimeout(() => button.classList.remove("pressed"), 140);
+}
+
+window.addEventListener("keydown", (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey) {
+    return;
+  }
+
+  if (/^[0-9.]$/.test(event.key)) {
+    const button = keypad.querySelector(`[data-digit="${event.key}"]`);
+    if (button) {
+      event.preventDefault();
+      flashButton(button);
+      enterDigit(event.key);
+    }
+    return;
+  }
+
+  const operation = operations.find((item) => item.symbol === event.key
+    || (event.key === "!" && item.symbol === "n!")
+    || ((event.key === "x" || event.key === "X") && item.symbol === "*"));
+  if (operation) {
+    event.preventDefault();
+    const button = Array.from(operationGrid.querySelectorAll(".operation-button"))
+      .find((item) => item.dataset.operationSymbol === operation.symbol);
+    flashButton(button);
+    selectOperation(operation);
+    return;
+  }
+
+  if (event.key === "Enter" || event.key === "=") {
+    event.preventDefault();
+    flashButton(equalsButton);
+    calculatePendingOperation();
+    return;
+  }
+
+  if (event.key === "Backspace") {
+    event.preventDefault();
+    flashButton(clearButton);
+    deleteLastDigit();
+    return;
+  }
+
+  if (event.key === "Escape" || event.key.toLowerCase() === "c") {
+    event.preventDefault();
+    flashButton(clearButton);
+    clearCalculator();
+  }
 });
 
 renderOperations();

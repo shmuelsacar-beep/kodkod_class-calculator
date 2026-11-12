@@ -5,14 +5,14 @@ Choose an unclaimed function and add your name. Check the box when your implemen
 | Done | Function | Student |
 | --- | --- | --- |
 | [ ] | Addition | | 
-| [ ] | Subtraction | |  תפוס שניאור 
-| [ ] | Multiplication | |
-| [ ] | Division | shmuel|
-| [ ] | Power | shmuel |
-| [ ] | Modulo (remainder) | |
+| [ ] | Subtraction | |              תפוס שניאור 
+| [ ] | Multiplication | |           תפוס שניאור
+| [ ] | Division | |                  תפוס שמואל 
+| [ ] | Power | |                     תפוס שמואל     
+| [ ] | Modulo (remainder) | | תפוס פנחס גרינפלד
 | [ ] | Square Root | |
 | [ ] | Percentage | |
-| [ ] | Factorial |תפוס פנחס גרינפלד |
+| [ ] | Factorial  | |         תפוס פנחס גרינפלד 
 | [ ] | Absolute Value | |
 | [ ] | Sine | |
 | [ ] | Cosine | |
